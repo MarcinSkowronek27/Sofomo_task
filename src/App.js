@@ -14,11 +14,51 @@ const stylerTwo = { padding: '17px 15px', width: '50px' };
 const stylerThree = { padding: '17px 0' };
 
 class App extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      searchList: [],
+      lastSearchLoc: '',
+      actualSearch: '',
+      lastSearch: '',
+    };
+  }
+
+  updateLastSearchField = (e) => {
+    const { searchList, actualSearch } = this.state;
+    this.setState({
+      searchList: [...searchList, actualSearch],
+      lastSearch: actualSearch,
+    });
+  };
+
+  updateSearchField = (e) => {
+    this.setState({
+      actualSearch: e.target.value,
+    });
+  };
+
   render() {
+
+    const { searchList, lastSearch } = this.state;
+    console.log(this.state);
     return (
       < div className="App" >
         <Row gutter={16}>
-          <Col style={styleTwo} span={4} gutter={16}>List search</Col>
+          <Col style={styleTwo} span={4} gutter={16}>List search:
+            {searchList.length === 0 ? null :
+              <>
+                {searchList.map((elem, index) => (
+                  <ul key={index}>
+                    <li>{elem}</li>
+                  </ul>
+                ))
+                }
+              </>
+            }
+          </Col>
           <Col span={20} gutter={16}>
             <Row>
               <Col span={12} style={styler}>
@@ -30,10 +70,10 @@ class App extends Component {
             </Row>
             <Row className='searchLine'>
               <Col span={12} style={stylerTwo}>
-                <Input placeholder="Write IP address or URL" />
+                <Input onChange={e => this.updateSearchField(e)} placeholder="Write IP address or URL" />
               </Col>
               <Col span={12} style={stylerThree} >
-                <Button type="primary" icon={<SearchOutlined />}>
+                <Button onClick={(e) => this.updateLastSearchField(e)} type="primary" icon={<SearchOutlined />}>
                   Search
                 </Button>
               </Col>
@@ -42,8 +82,9 @@ class App extends Component {
               <Col span={12} style={styler}>
                 <div style={style}>Map with last search location</div>
               </Col>
-              <Col span={12}>
-                <div style={style}>Information about last search</div>
+              <Col span={12} >
+                <div className='lastSearchBox'><h3>Information about last search:</h3>
+                  <p>{lastSearch}</p></div>
               </Col>
             </Row>
           </Col>
@@ -66,8 +107,6 @@ App.propTypes = {
 };
 
 export default GoogleApiWrapper({
-  apiKey: ('AIzaSyARjmtGWUw3Gbbfn-8Ca4EfNxKChBb46R8'),
+  apiKey: ('KEY'),
 })(App);
 
-//a930b10b2346d8db9d332d5a7b2562b5
-//AIzaSyARjmtGWUw3Gbbfn-8Ca4EfNxKChBb46R8
