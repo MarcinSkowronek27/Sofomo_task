@@ -6,6 +6,7 @@ import './styles/global.scss';
 import 'antd/dist/antd.css';
 import { Button, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
+import UserLocation from './components/UserLocation';
 
 const style = { background: '#0092ff', padding: '8px 0', height: '265px', border: 'solid' };
 const styleTwo = { background: '#0092aa', padding: '8px 0', height: '600px' };
@@ -19,11 +20,24 @@ class App extends Component {
     super(props);
 
     this.state = {
+      data: [],
       searchList: [],
       lastSearchLoc: '',
       actualSearch: '',
       lastSearch: '',
     };
+  }
+
+  componentDidMount() {
+    fetch('http://api.ipstack.com/194.152.50.225?access_key=a930b10b2346d8db9d332d5a7b2562b5')
+      .then(res => res.json())
+      .then((data) => {
+        this.setState({ data: data });
+        console.log(data);
+
+      })
+      .catch(console.log);
+
   }
 
   updateLastSearchField = (e) => {
@@ -42,8 +56,8 @@ class App extends Component {
 
   render() {
 
-    const { searchList, lastSearch } = this.state;
-    console.log(this.state);
+    const { searchList, lastSearch, data } = this.state;
+    // console.log(this.state);
     return (
       < div className="App" >
         <Row gutter={16}>
@@ -65,7 +79,7 @@ class App extends Component {
                 <div style={style}>Map with user location</div>
               </Col>
               <Col span={12} >
-                <div style={style}>Information about user location</div>
+                <div style={style}><UserLocation location = {data}/></div>
               </Col>
             </Row>
             <Row className='searchLine'>
