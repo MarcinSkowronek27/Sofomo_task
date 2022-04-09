@@ -25,11 +25,24 @@ class App extends Component {
       lastSearchLoc: '',
       actualSearch: '',
       lastSearch: '',
+      addressIP: '126.145.131.63',
     };
   }
 
+  static getDerivedStateFromProps(props, state) {
+    // Any time the current user changes,
+    // Reset any parts of state that are tied to that user.
+    // In this simple example, that's just the email.
+    if (props.data !== state.prevPropsData) {
+      return {
+        prevPropsData: props.data,
+      };
+    }
+    return null;
+  }
+
   componentDidMount() {
-    fetch('http://api.ipstack.com/194.152.50.225?access_key=a930b10b2346d8db9d332d5a7b2562b5')
+    fetch(`http://api.ipstack.com/${this.state.addressIP}?access_key=a930b10b2346d8db9d332d5a7b2562b5`)
       .then(res => res.json())
       .then((data) => {
         this.setState({ data: data });
@@ -37,7 +50,19 @@ class App extends Component {
 
       })
       .catch(console.log);
+  }
 
+  componentDidUpdate(prevProps, prevState, snapShot) {
+    if (prevState.addressIP !== this.state.lastSearch) {
+      fetch(`http://api.ipstack.com/${this.state.addressIP}?access_key=a930b10b2346d8db9d332d5a7b2562b5`)
+        .then(res => res.json())
+        .then((data) => {
+          this.setState({ data: data });
+          console.log(data);
+        })
+        .catch(console.log);
+      console.log('działa', prevState.addressIP);
+    }
   }
 
   updateLastSearchField = (e) => {
@@ -45,6 +70,7 @@ class App extends Component {
     this.setState({
       searchList: [...searchList, actualSearch],
       lastSearch: actualSearch,
+      addressIP: actualSearch,
     });
   };
 
@@ -57,7 +83,7 @@ class App extends Component {
   render() {
 
     const { searchList, lastSearch, data } = this.state;
-    // console.log(this.state);
+    console.log(this.state);
     return (
       < div className="App" >
         <Row gutter={16}>
@@ -79,7 +105,7 @@ class App extends Component {
                 <div style={style}>Map with user location</div>
               </Col>
               <Col span={12} >
-                <div style={style}><UserLocation location = {data}/></div>
+                <div style={style}><UserLocation location={data} /></div>
               </Col>
             </Row>
             <Row className='searchLine'>
@@ -118,6 +144,7 @@ class App extends Component {
 
 App.propTypes = {
   google: PropTypes.any,
+  data: PropTypes.object,
 };
 
 export default GoogleApiWrapper({
