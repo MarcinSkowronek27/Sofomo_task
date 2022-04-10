@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { GoogleMap, LoadScript } from '@react-google-maps/api';
 import { Marker } from '@react-google-maps/api';
+import PropTypes from 'prop-types';
 
 const containerStyle = {
   width: '100%',
@@ -18,18 +19,26 @@ const onLoad = marker => {
 
 class MyMap extends Component {
   render() {
+    const { locationData } = this.props;
+    console.log('locationData', Math.round(locationData.longitude * 1000) / 1000, locationData.longitude);
     return (
       <LoadScript
         googleMapsApiKey="AIzaSyARjmtGWUw3Gbbfn-8Ca4EfNxKChBb46R8"
       >
         <GoogleMap
           mapContainerStyle={containerStyle}
-          center={center}
+          center={{
+            lat: locationData.latitude,
+            lng: locationData.longitude,
+          }}
           zoom={10}
         >
           <Marker
             onLoad={onLoad}
-            position={center}
+            position={{
+              lat: locationData.latitude,
+              lng: locationData.longitude,
+            }}
           />
           { /* Child components, such as markers, info windows, etc. */}
           <></>
@@ -38,5 +47,9 @@ class MyMap extends Component {
     );
   }
 }
+
+MyMap.propTypes = {
+  locationData: PropTypes.object,
+};
 
 export default MyMap;
