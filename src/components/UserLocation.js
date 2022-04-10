@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 const UserLocation = ({ location }) => {
   return (
     <div>
-      <center><h2>Information about user location:</h2></center>
+      <center><h3>Information about user location:</h3></center>
       <div>
         <h3 >{location.country_name}</h3>
         <h3>{location.city}</h3>

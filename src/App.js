@@ -1,18 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col } from 'antd';
-import { Map, InfoWindow, Marker, GoogleApiWrapper } from 'google-maps-react';
 import './styles/global.scss';
 import 'antd/dist/antd.css';
 import { Button, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import UserLocation from './components/UserLocation';
+import MyMap from './components/MapTwo';
 
 const style = { background: '#0092ff', padding: '8px 0', height: '265px', border: 'solid' };
-const styleTwo = { background: '#0092aa', padding: '8px 0', height: '600px' };
+const styleTwo = { background: '#0092aa', padding: '8px 0', height: '634px' };
 const styler = { padding: '0 15px' };
 const stylerTwo = { padding: '17px 15px', width: '50px' };
 const stylerThree = { padding: '17px 0' };
+const stylerFour = { margin: '34px 0 0 0'};
 
 class App extends Component {
 
@@ -30,9 +31,6 @@ class App extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    // Any time the current user changes,
-    // Reset any parts of state that are tied to that user.
-    // In this simple example, that's just the email.
     if (props.data !== state.prevPropsData) {
       return {
         prevPropsData: props.data,
@@ -120,23 +118,17 @@ class App extends Component {
             </Row>
             <Row>
               <Col span={12} style={styler}>
-                <div style={style}>Map with last search location</div>
+                <h3>Map with last search location</h3>
+                <div className='mapLastSearch' >
+                  <MyMap /></div>
               </Col>
-              <Col span={12} >
+              <Col span={12} style={stylerFour}>
                 <div className='lastSearchBox'><h3>Information about last search:</h3>
                   <p>{lastSearch}</p></div>
               </Col>
             </Row>
           </Col>
         </Row>
-        {/* <Map google={this.props.google} zoom={14}>
-
-          <Marker onClick={this.onMarkerClick}
-            name={'Current location'} />
-
-          <InfoWindow onClose={this.onInfoWindowClose}>
-          </InfoWindow>
-        </Map> */}
       </div >
     );
   }
@@ -147,7 +139,4 @@ App.propTypes = {
   data: PropTypes.object,
 };
 
-export default GoogleApiWrapper({
-  apiKey: ('KEY'),
-})(App);
-
+export default App;
