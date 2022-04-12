@@ -6,7 +6,8 @@ import 'antd/dist/antd.css';
 import { Button, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import UserLocation from './components/UserLocation';
-import MyMap from './components/MapTwo';
+import MyMap from './components/GoogleMap';
+import axios from 'axios';
 
 const style = { background: '#0092ff', padding: '8px 0', height: '265px', border: 'solid' };
 const styleTwo = { background: '#0092aa', padding: '8px 0', height: '668px' };
@@ -21,26 +22,13 @@ class App extends Component {
     super(props);
 
     this.state = {
-      data: {
-        'ip': '134.201.250.155',
-        'hostname': '134.201.250.155',
-        'type': 'ipv4',
-        'continent_code': 'NA',
-        'continent_name': 'North America',
-        'country_code': 'US',
-        'country_name': 'Poland',
-        'region_code': 'CA',
-        'region_name': 'California',
-        'city': 'Zielona Góra',
-        'zip': '90013',
-        'latitude': 53.35388946533203,
-        'longitude': -6.243330001831055,
-      },
+      data: {},
       searchList: [],
       lastSearchLoc: '',
       actualSearch: '',
       lastSearch: '',
-      addressIP: '126.145.131.63',
+      addressIp: '',
+      yourIp: '',
       lastData: {},
     };
   }
@@ -54,38 +42,80 @@ class App extends Component {
     return null;
   }
 
-  // componentDidMount() {
-  //   fetch(`http://api.ipstack.com/${this.state.addressIP}?access_key=a930b10b2346d8db9d332d5a7b2562b5`)
-  //     .then(res => res.json())
-  //     .then((data) => {
-  //       this.setState({ data: data });
-  //       console.log(data);
+  getIpData = async () => {
+    const res = await axios.get('https://geolocation-db.com/json/');
+    // console.log(res.data);
+    this.setState({
+      data:
+        res.data,
+      yourIp: res.data.IPv4,
+    });
+    console.log('zadziałało');
+  };
 
-  //     })
-  //     .catch(console.log);
+  getDataFromApi = () => {
+    const { searchList, actualSearch, data } = this.state;
+    fetch(`https://geolocation-db.com/json/${this.state.actualSearch}`)
+      .then(res => res.json())
+      .then((data) => {
+        this.setState(
+          {
+            data: data,
+            searchList: [...searchList, actualSearch],
+            lastSearch: actualSearch,
+          });
+      })
+      .catch(console.log('Problem with connection'));
+  };
+
+  componentDidMount() {
+    if (this.state.yourIp === '') this.getIpData();
+  }
+
+  //  nie używaj componentDidUpdate akurat tutaj
+  // componentDidUpdate(prevProps, prevState, snapShot) {
+  //   if (prevState.addressIp !== this.state.lastSearch) {
+  //     fetch(`https://geolocation-db.com/jsonp/${this.state.addressIp}`)
+  //       .then(res => res.json())
+  //       .then((data) => {
+  //         this.setState({ lastData: data });
+  //         console.log(data);
+  //       })
+  //       .catch(console.log);
+  //     console.log('działa', prevState.addressIp);
+  //   }
   // }
 
   // componentDidUpdate(prevProps, prevState, snapShot) {
-  //   if (prevState.addressIP !== this.state.lastSearch) {
-  //     fetch(`http://api.ipstack.com/${this.state.addressIP}?access_key=a930b10b2346d8db9d332d5a7b2562b5`)
+  //   if (prevState.addressIp !== this.state.lastSearch) {
+  //     fetch(`http://api.ipstack.com/${this.state.data.ip}?access_key=${process.env.MY_API_KEY}`)
   //       .then(res => res.json())
   //       .then((data) => {
   //         this.setState({ data: data });
   //         console.log(data);
   //       })
   //       .catch(console.log);
-  //     console.log('działa', prevState.addressIP);
+  //     console.log('działa', prevState.addressIp);
   //   }
   // }
 
+
   updateLastSearchField = (e) => {
     const { searchList, actualSearch, data } = this.state;
-    this.setState({
-      searchList: [...searchList, actualSearch],
-      lastSearch: actualSearch,
-      addressIP: actualSearch,
-      lastData: data,
-    });
+    if (actualSearch.length < 11) {
+      alert('Your IP address is too short');
+    }
+    if (actualSearch === '') {
+      this.setState({
+        searchList: [...searchList, actualSearch],
+        lastSearch: actualSearch,
+        addressIp: actualSearch,
+        lastData: data,
+      });
+    }
+    else {
+      this.getDataFromApi();
+    }
   };
 
   updateSearchField = (e) => {
@@ -95,9 +125,8 @@ class App extends Component {
   };
 
   render() {
-
     const { searchList, lastSearch, data, lastData } = this.state;
-    console.log(this.state.data);
+    console.log(this.state);
     return (
       < div className="App" >
         <Row gutter={16}>
@@ -139,6 +168,7 @@ class App extends Component {
               <Col span={12} style={styler}>
                 <h3>Map with last search location</h3>
                 <div className='mapLastSearch' >
+
                   <MyMap locationData={lastData} /></div>
               </Col>
               <Col span={12} style={stylerFour}>
