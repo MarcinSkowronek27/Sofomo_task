@@ -9,12 +9,10 @@ import UserLocation from './components/UserLocation';
 import MyMap from './components/GoogleMap';
 import axios from 'axios';
 
-const style = { background: '#0092ff', padding: '8px 0', height: '265px', border: 'solid' };
 const styleTwo = { background: '#0092aa', padding: '8px 0', height: '668px' };
 const styler = { padding: '0 15px' };
 const stylerTwo = { padding: '17px 15px', width: '50px' };
 const stylerThree = { padding: '17px 0' };
-const stylerFour = { margin: '34px 0 0 0' };
 
 class App extends Component {
 
@@ -27,7 +25,6 @@ class App extends Component {
       lastSearchLoc: '',
       actualSearch: '',
       lastSearch: '',
-      addressIp: '',
       yourIp: '',
       lastData: {},
     };
@@ -44,7 +41,6 @@ class App extends Component {
 
   getIpData = async () => {
     const res = await axios.get('https://geolocation-db.com/json/');
-    // console.log(res.data);
     this.setState({
       data:
         res.data,
@@ -68,54 +64,40 @@ class App extends Component {
       .catch(console.log('Problem with connection'));
   };
 
+  getPrevDataFromApi = () => {
+    const { searchList } = this.state;
+    const prevIp = searchList[searchList.length - 1];
+    fetch(`https://geolocation-db.com/json/${prevIp}`)
+      .then(res => res.json())
+      .then((data) => {
+        this.setState(
+          {
+            lastData: data,
+          });
+      })
+      .catch(console.log('Problem with connection'));
+  };
+
   componentDidMount() {
     if (this.state.yourIp === '') this.getIpData();
   }
 
-  //  nie używaj componentDidUpdate akurat tutaj
-  // componentDidUpdate(prevProps, prevState, snapShot) {
-  //   if (prevState.addressIp !== this.state.lastSearch) {
-  //     fetch(`https://geolocation-db.com/jsonp/${this.state.addressIp}`)
-  //       .then(res => res.json())
-  //       .then((data) => {
-  //         this.setState({ lastData: data });
-  //         console.log(data);
-  //       })
-  //       .catch(console.log);
-  //     console.log('działa', prevState.addressIp);
-  //   }
-  // }
-
-  // componentDidUpdate(prevProps, prevState, snapShot) {
-  //   if (prevState.addressIp !== this.state.lastSearch) {
-  //     fetch(`http://api.ipstack.com/${this.state.data.ip}?access_key=${process.env.MY_API_KEY}`)
-  //       .then(res => res.json())
-  //       .then((data) => {
-  //         this.setState({ data: data });
-  //         console.log(data);
-  //       })
-  //       .catch(console.log);
-  //     console.log('działa', prevState.addressIp);
-  //   }
-  // }
-
-
   updateLastSearchField = (e) => {
     const { searchList, actualSearch, data } = this.state;
-    if (actualSearch.length < 11) {
+    if (actualSearch.length < 11 && actualSearch.length === 0) {
+      alert('You can not leave an empty value');
+    }
+    if (actualSearch.length < 11 && actualSearch.length !== 0) {
       alert('Your IP address is too short');
     }
+    if (searchList[0] !== '') this.getPrevDataFromApi();
     if (actualSearch === '') {
       this.setState({
-        searchList: [...searchList, actualSearch],
         lastSearch: actualSearch,
-        addressIp: actualSearch,
         lastData: data,
       });
     }
-    else {
-      this.getDataFromApi();
-    }
+    this.getDataFromApi();
   };
 
   updateSearchField = (e) => {
@@ -125,7 +107,7 @@ class App extends Component {
   };
 
   render() {
-    const { searchList, lastSearch, data, lastData } = this.state;
+    const { searchList, data, lastData } = this.state;
     console.log(this.state);
     return (
       < div className="App" >
@@ -150,8 +132,8 @@ class App extends Component {
                   <MyMap locationData={data} /></div>
               </Col>
               <Col span={12} >
-                <h3>Information about user location:</h3>
-                <div style={style}><UserLocation location={data} /></div>
+                <h3>Information about user location</h3>
+                <div className='lastSearchBox'><UserLocation location={data} /></div>
               </Col>
             </Row>
             <Row className='searchLine'>
@@ -168,12 +150,14 @@ class App extends Component {
               <Col span={12} style={styler}>
                 <h3>Map with last search location</h3>
                 <div className='mapLastSearch' >
-
-                  <MyMap locationData={lastData} /></div>
+                  <MyMap locationData={lastData} />
+                </div>
               </Col>
-              <Col span={12} style={stylerFour}>
-                <div className='lastSearchBox'><h3>Information about last search:</h3>
-                  <p>{lastSearch}</p></div>
+              <Col span={12}>
+                <h3>Information about last search</h3>
+                <div className='lastSearchBox'>
+                  <UserLocation location={lastData} />
+                </div>
               </Col>
             </Row>
           </Col>

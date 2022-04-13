@@ -23,7 +23,7 @@ class MyMap extends Component {
     // console.log('locationData', Math.round(locationData.longitude * 1000) / 1000, locationData.longitude);
     return (
       <LoadScript
-        googleMapsApiKey="AIzaSyARjmtGWUw3Gbbfn-8Ca4EfNxKChBb46R8"
+        googleMapsApiKey={process.env.MY_API_KEY}
       >
         <GoogleMap
           mapContainerStyle={containerStyle}
