@@ -1,18 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col } from 'antd';
-import './styles/global.scss';
+import './App.scss';
 import 'antd/dist/antd.css';
 import { Button, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import UserLocation from './components/UserLocation';
 import MyMap from './components/GoogleMap';
 import axios from 'axios';
-
-const styleTwo = { background: '#0092aa', padding: '8px 0', height: '668px' };
-const styler = { padding: '0 15px' };
-const stylerTwo = { padding: '17px 15px', width: '50px' };
-const stylerThree = { padding: '17px 0' };
 
 class App extends Component {
 
@@ -46,11 +41,12 @@ class App extends Component {
         res.data,
       yourIp: res.data.IPv4,
     });
-    console.log('zadziałało');
   };
 
   getDataFromApi = () => {
-    const { searchList, actualSearch, data } = this.state;
+    const sessionData = [];
+    const { searchList, actualSearch } = this.state;
+    sessionData.push(actualSearch);
     fetch(`https://geolocation-db.com/json/${this.state.actualSearch}`)
       .then(res => res.json())
       .then((data) => {
@@ -84,6 +80,9 @@ class App extends Component {
 
   updateLastSearchField = (e) => {
     const { searchList, actualSearch, data } = this.state;
+    const allSearchData = JSON.parse(sessionStorage.getItem('allData')) || [];
+    allSearchData.push(actualSearch);
+    sessionStorage.setItem('allData', JSON.stringify(allSearchData));
     if (actualSearch.length < 11 && actualSearch.length === 0) {
       alert('You can not leave an empty value');
     }
@@ -112,7 +111,8 @@ class App extends Component {
     return (
       < div className="App" >
         <Row gutter={16}>
-          <Col style={styleTwo} span={4} gutter={16}>List search:
+          <Col className='searchListBox' span={4} gutter={16}>
+            <h3>List search:</h3>
             {searchList.length === 0 ? null :
               <>
                 {searchList.map((elem, index) => (
@@ -126,7 +126,7 @@ class App extends Component {
           </Col>
           <Col span={20} gutter={16}>
             <Row>
-              <Col span={12} style={styler}>
+              <Col span={12} className='mapBox'>
                 <h3>Map with user location</h3>
                 <div className='mapLastSearch' >
                   <MyMap locationData={data} /></div>
@@ -137,17 +137,17 @@ class App extends Component {
               </Col>
             </Row>
             <Row className='searchLine'>
-              <Col span={12} style={stylerTwo}>
+              <Col span={12} className='inputBox'>
                 <Input onChange={e => this.updateSearchField(e)} placeholder="Write IP address or URL" />
               </Col>
-              <Col span={12} style={stylerThree} >
+              <Col span={12} className='searchButtonBox' >
                 <Button onClick={(e) => this.updateLastSearchField(e)} type="primary" icon={<SearchOutlined />}>
                   Search
                 </Button>
               </Col>
             </Row>
-            <Row>
-              <Col span={12} style={styler}>
+            <Row className='test'>
+              <Col span={12} className='mapBox'>
                 <h3>Map with last search location</h3>
                 <div className='mapLastSearch' >
                   <MyMap locationData={lastData} />

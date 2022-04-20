@@ -1,0 +1,52 @@
+@import "./styles/global.scss";
+@import "~antd/dist/antd.css";
+
+.Map {
+  height: 100%;
+}
+
+.App {
+  text-align: center;
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+}
+
+.inputBox {
+  padding: 17px 15px;
+  width: 50px;
+}
+
+.searchButtonBox {
+  padding: 17px 0;
+}
+
+.mapBox {
+  padding: 0 15px;
+}
+
+.searchListBox {
+  background: white;
+  padding: 8px 0;
+  height: 668px;
+}
+
+.searchLine {
+  height: 70px;
+}
+
+.mapLastSearch {
+  height: 265px;
+}
+
+.lastSearchBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background: white;
+  padding: 8px 0;
+  height: 265px;
+}
